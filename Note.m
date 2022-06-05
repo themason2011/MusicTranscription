@@ -1,9 +1,9 @@
 classdef Note
     properties
         onset
-        offset
         pitch
         string
         fret
+        midi
     end
 end
