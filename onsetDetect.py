@@ -5,29 +5,31 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 
-# win_s = 1024                 # fft size
-# hop_s = win_s // 2          # hop size
+win_s = 2048                 # fft size
+hop_s = win_s // 2          # hop size
 
-# s = source('audio/AR_Lick1_KN.wav', hop_size=hop_s)
-# samplerate = s.samplerate
+s = source('audio/AR_Lick2_KN.wav', hop_size=hop_s)
+samplerate = s.samplerate
 
-# o = onset("default", win_s, hop_s, samplerate)
+o = onset("default", win_s, hop_s, samplerate)
 
-# # list of onsets, in samples
-# onsets = []
+# list of onsets, in samples
+onsets = []
 
-# # total number of frames read
-# total_frames = 0
-# hamming_win = np.hamming(hop_s).astype('float32')
-# while True:
-#     samples, read = s()
-#     samples = samples*hamming_win
-#     if o(samples):
-#         print("%f" % o.get_last_s())
-#         onsets.append(o.get_last()/samplerate)
-#     total_frames += read
-#     if read < hop_s: break
-# print(len(onsets))
+# total number of frames read
+total_frames = 0
+hamming_win = np.hamming(hop_s).astype('float32')
+while True:
+    samples, read = s()
+    samples = samples*hamming_win
+    if o(samples):
+        print("%f" % o.get_last_s())
+        onsets.append(o.get_last()/samplerate)
+    total_frames += read
+    if read < hop_s: break
+print(len(onsets))
+print(type(onsets))
+print(type(onsets[1]))
 
 # y, sr = librosa.load('audio/AR_Lick1_KN.wav', sr=None)
 # librosa.onset.onset_detect(y=y, sr=sr, units='time')
@@ -48,7 +50,7 @@ import matplotlib.pyplot as plt
 # ax[1].legend()
 # plt.show()
 
-y, sr = librosa.load('audio/AR_Lick6_KN.wav', sr=None)
-onset_env = librosa.onset.onset_strength(y=y, sr=sr)
-tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
-print(tempo)
+# y, sr = librosa.load('audio/AR_Lick6_KN.wav', sr=None)
+# onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+# tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
+# print(tempo)

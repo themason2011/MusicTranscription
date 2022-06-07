@@ -32,7 +32,15 @@ function noteArray = stringDetect(input, Fs, noteArray)
     %the Barbancho paper, as well as the equation for calculating each 
     %string-fret combo's inharmonicity coefficient
     
-    stringFretToInharm = [3.99822*10.^-4; -5.0594*10.^-5; 4.5293*10^-5; 9.9292*10.^-5; 5.43053*10.^-5; 9.7346*10.^-6]*2.0.^([0:12]/6.0);
+    %Defining inharmonicity coefficients from my calibration using a
+    %stratocaster and the coefficients from barbancho's paper. My
+    %strat_cal's accuracy is 0.653 and Barbancho's coefficients have 0.421
+    %accuracy
+    new_strat_cal_coefs = [1.1080*10.^-4; 1.5646*10.^-5; 5.6813*10^-7; 8.9632*10.^-5; 1.4110*10.^-5; -1.3497*10.^-5];
+    strat_cal_coefs = [3.99822*10.^-4; -5.0594*10.^-5; 4.5293*10^-5; 9.9292*10.^-5; 5.43053*10.^-5; 9.7346*10.^-6];
+    barbancho_coefs = [1.50*10.^-05; 5.02*10.^-05; 8.27*10.^-05; 5.30*10.^-05; 9.04*10.^-05; 1.56*10.^-04];
+    
+    stringFretToInharm = strat_cal_coefs*2.0.^([0:12]/6.0);
     
     
     for i = 1:length(noteArray)

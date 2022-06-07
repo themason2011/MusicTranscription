@@ -12,18 +12,22 @@ function [flux, noteArray] = onsetDetect(input, Fs, noteArray)
 
     %Defining parameters for block-based processing     
     blockSize = 2048;
-    hopSize = round(0.25*blockSize);
+    hopSize = round(0.05*blockSize);
     
     %Applying the Spectral Flux to the original time signal, using a
     %hamming window and 75% overlap.
-    flux = spectralFlux(input, Fs, "Window", hamming(blockSize), "OverlapLength", blockSize-hopSize, "Range", [62.5,Fs/2]);
-
+    flux = spectralFlux(input, Fs, "Window", hann(blockSize), "OverlapLength", blockSize-hopSize, "Range", [62.5,Fs/2]);
+    cubed_flux = flux.^3;
+    norm_flux = mat2gray(cubed_flux);
+    plot(linspace(0,length(input)/Fs,length(norm_flux)),norm_flux);
+    xlabel('Time (sec)');
+    ylabel('Magnitude');
     %Perform peak picking on the spectral flux results (MinPeakDistance is
     %the number of spectral units calculated based on a minimum distance 
     %of 50 ms between notes, which is approximately a 1/32nd note at 180 
     %BPM. Can probably change this MinPeakDistance based on tempo to reduce
     %the chance of ghost notes being detected from transients)
-    [~, onsets] = findpeaks(flux, 'MinPeakHeight', 4*10.^-3, 'MinPeakDistance', 6)
+    [~, onsets] = findpeaks(norm_flux, 'MinPeakHeight', 0.02, 'MinPeakDistance', 11);
 
     %Convert the onset location values from spectral flux units to time
     %units. One spectral flux unit is equal to hopSize number of time

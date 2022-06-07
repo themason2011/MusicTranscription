@@ -1,5 +1,6 @@
-function result = calcAcc(noteArray, testNoteArray, type)
-    numCorrect = 0;
+function result = calcRecall(noteArray, testNoteArray, type)
+    truePositive = 0;
+    falseNegative = 0;
     if type == "overall"
         %For a note in noteArray to be classified as correct in overall
         %mode, it must have the correct onset (within a certain range), a
@@ -9,11 +10,20 @@ function result = calcAcc(noteArray, testNoteArray, type)
                 minOnset = testNoteArray(i).onset - 0.02;
                 maxOnset = testNoteArray(i).onset + 0.0375;
                 if (noteArray(j).onset > minOnset & noteArray(j).onset < maxOnset) & noteArray(j).midi == testNoteArray(i).midi & noteArray(j).string == testNoteArray(i).string
-                    numCorrect = numCorrect + 1;
+                    truePositive = truePositive + 1;
+                    falseNegative = falseNegative - 1;
                     break
                 end
             end
+            %If this line is reached, it means no positives were found for
+            %this true note, meaning that this is a false negative (i.e. no
+            %note has been detected when there should have been).
+            falseNegative = falseNegative + 1;
         end
+        
+        %Recall is the same as accuracy in this case, because only
+        %"positives" are reported
+        falsePositive = length(noteArray) - truePositive;
 
     elseif type == "onset"
         %For each onset in testNoteArray, check if one of the onsets in
@@ -28,30 +38,17 @@ function result = calcAcc(noteArray, testNoteArray, type)
                 minOnset = testNoteArray(i).onset - 0.02;
                 maxOnset = testNoteArray(i).onset + 0.0375;
                 if (noteArray(j).onset > minOnset & noteArray(j).onset < maxOnset)
-                    numCorrect = numCorrect + 1;
+                    truePositive = truePositive + 1;
+                    falseNegative = falseNegative - 1;
                     break
                 end
             end
-        end
-
-    elseif type == "pitch"
-        %noteArray is the same length as testNoteArray, because the ground
-        %truth onsets are given for this calculation
-        for i = 1:length(testNoteArray)
-            if noteArray(i).midi == testNoteArray(i).midi
-                numCorrect = numCorrect + 1;
-            end
-        end
-
-    elseif type == "string"
-        %Same thing as in pitch mode, except both ground truth onset AND
-        %midi pitch are given
-        for i = 1:length(testNoteArray)
-            if noteArray(i).string == testNoteArray(i).string
-                numCorrect = numCorrect + 1;
-            end
+            
+            %If this line is reached, it means no positives were found for
+            %this true note, meaning that this is a false negative (i.e. no
+            %note has been detected when there should have been).
+            falseNegative = falseNegative + 1;
         end
     end
     
-    result = numCorrect/length(noteArray);
-end
+    result = truePositive/(truePositive + falseNegative);
